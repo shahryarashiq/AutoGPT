@@ -8,7 +8,7 @@ The voice module for AutoGPT Classic provides Text-to-Speech (TTS) functionality
 
 The voice module has been successfully installed! The following packages are now available:
 
-- **gTTS** (Google Text-to-Speech) v2.5.1 - Default TTS provider
+- **gTTS** (Google Text-to-Speech) v2.3.1+ - Default TTS provider
 - **playsound** v1.2.2 - Audio playback library
 
 ### Installation Steps
@@ -75,7 +75,8 @@ TEXT_TO_SPEECH_PROVIDER=gtts
 
 # For ElevenLabs (optional)
 ELEVENLABS_API_KEY=your_api_key_here
-ELEVENLABS_VOICE_ID=Rachel
+# Use either voice name or voice ID:
+ELEVENLABS_VOICE_ID=Rachel  # or use voice ID: 21m00Tcm4TlvDq8ikWAM
 ```
 
 ### Programmatic Usage
@@ -133,6 +134,8 @@ If using ElevenLabs, verify your API key is valid:
 
 ## Available Voices (ElevenLabs)
 
+**Note:** You can use either the voice name or the voice ID. The system will automatically convert names to IDs.
+
 | Name   | Voice ID                  |
 |--------|---------------------------|
 | Rachel | `21m00Tcm4TlvDq8ikWAM`    |
@@ -147,8 +150,8 @@ If using ElevenLabs, verify your API key is valid:
 
 ## Additional Resources
 
-- [Voice Configuration Documentation](docs/content/classic/configuration/voice.md)
-- [AutoGPT Classic Documentation](docs/)
+- [Voice Configuration Documentation](/docs/content/classic/configuration/voice.md) (in the repository)
+- [AutoGPT Classic Documentation](/docs/)
 - [ElevenLabs API Documentation](https://docs.elevenlabs.io/)
 
 ## Notes
