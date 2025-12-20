@@ -206,16 +206,20 @@ class ForexGoldStrategyBlock(Block):
             description="Recommended take profit level"
         )
         technical_analysis: Dict[str, Any] = SchemaField(
-            description="Technical analysis results and indicator values"
+            description="Technical analysis results and indicator values",
+            default_factory=dict,
         )
         fundamental_analysis: Dict[str, Any] = SchemaField(
-            description="Fundamental analysis results"
+            description="Fundamental analysis results",
+            default_factory=dict,
         )
         strategy_explanation: str = SchemaField(
-            description="Detailed explanation of the trading signal"
+            description="Detailed explanation of the trading signal",
+            default="",
         )
         error: str = SchemaField(
-            description="Error message if analysis fails"
+            description="Error message if analysis fails",
+            default="",
         )
 
     def __init__(self):
@@ -577,6 +581,9 @@ class ForexGoldStrategyBlock(Block):
                 yield "error", "Insufficient price data. Please provide at least 3 data points."
                 yield "signal", SignalType.HOLD.value
                 yield "confidence", 0.0
+                yield "technical_analysis", {}
+                yield "fundamental_analysis", {}
+                yield "strategy_explanation", "Insufficient price data for analysis"
                 return
 
             # Extract close prices
@@ -657,3 +664,6 @@ class ForexGoldStrategyBlock(Block):
             yield "error", error_msg
             yield "signal", SignalType.HOLD.value
             yield "confidence", 0.0
+            yield "technical_analysis", {}
+            yield "fundamental_analysis", {}
+            yield "strategy_explanation", f"Analysis failed: {error_msg}"
