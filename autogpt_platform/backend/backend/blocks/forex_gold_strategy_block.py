@@ -279,26 +279,48 @@ class ForexGoldStrategyBlock(Block):
         self, prices: List[float], fast: int = 12, slow: int = 26, signal: int = 9
     ) -> Dict[str, float]:
         """Calculate MACD indicator"""
-        if len(prices) < slow:
+        if len(prices) < slow + signal:
             return {"macd": 0.0, "signal": 0.0, "histogram": 0.0}
 
         # Calculate EMAs
-        def calculate_ema(data: List[float], period: int) -> float:
+        def calculate_ema(data: List[float], period: int) -> List[float]:
+            """Calculate EMA values for all data points"""
             if len(data) < period:
-                return sum(data) / len(data)
+                return [sum(data) / len(data)] * len(data)
+            
             multiplier = 2 / (period + 1)
+            emas = []
+            # Start with SMA for first value
             ema = sum(data[:period]) / period
+            emas.append(ema)
+            
+            # Calculate EMA for remaining values
             for price in data[period:]:
                 ema = (price - ema) * multiplier + ema
-            return ema
+                emas.append(ema)
+            
+            return emas
 
-        ema_fast = calculate_ema(prices, fast)
-        ema_slow = calculate_ema(prices, slow)
-        macd_line = ema_fast - ema_slow
+        # Get EMA series
+        ema_fast_series = calculate_ema(prices, fast)
+        ema_slow_series = calculate_ema(prices, slow)
+        
+        # Calculate MACD line (difference between EMAs)
+        # Align the series by taking the last len(ema_slow_series) values
+        macd_series = []
+        for i in range(len(ema_slow_series)):
+            macd_series.append(ema_fast_series[i] - ema_slow_series[i])
+        
+        # Calculate signal line (EMA of MACD line)
+        if len(macd_series) >= signal:
+            signal_multiplier = 2 / (signal + 1)
+            signal_line = sum(macd_series[:signal]) / signal
+            for macd_val in macd_series[signal:]:
+                signal_line = (macd_val - signal_line) * signal_multiplier + signal_line
+        else:
+            signal_line = sum(macd_series) / len(macd_series) if macd_series else 0.0
 
-        # For simplicity, using a basic signal line calculation
-        signal_line = macd_line * 0.9  # Simplified
-
+        macd_line = macd_series[-1] if macd_series else 0.0
         histogram = macd_line - signal_line
 
         return {
@@ -389,25 +411,34 @@ class ForexGoldStrategyBlock(Block):
         self, price_data: List[Dict[str, float]], k_period: int = 14, d_period: int = 3
     ) -> Dict[str, float]:
         """Calculate Stochastic Oscillator"""
-        if len(price_data) < k_period:
+        if len(price_data) < k_period + d_period - 1:
             return {"k": 50.0, "d": 50.0}
 
-        # Calculate %K
-        recent_data = price_data[-k_period:]
-        highest_high = max(bar["high"] for bar in recent_data)
-        lowest_low = min(bar["low"] for bar in recent_data)
-        current_close = price_data[-1]["close"]
+        # Calculate %K values for the last d_period points
+        k_values = []
+        for i in range(len(price_data) - k_period + 1):
+            window = price_data[i:i + k_period]
+            highest_high = max(bar["high"] for bar in window)
+            lowest_low = min(bar["low"] for bar in window)
+            current_close = window[-1]["close"]
+            
+            if highest_high == lowest_low:
+                k = 50.0
+            else:
+                k = ((current_close - lowest_low) / (highest_high - lowest_low)) * 100
+            
+            k_values.append(k)
 
-        if highest_high == lowest_low:
-            k = 50.0
+        # Get the most recent %K
+        current_k = k_values[-1]
+
+        # Calculate %D (SMA of last d_period %K values)
+        if len(k_values) >= d_period:
+            d = sum(k_values[-d_period:]) / d_period
         else:
-            k = ((current_close - lowest_low) / (highest_high - lowest_low)) * 100
+            d = sum(k_values) / len(k_values) if k_values else 50.0
 
-        # Calculate %D (simple moving average of %K)
-        # For simplicity, using current %K as %D
-        d = k * 0.95  # Simplified
-
-        return {"k": k, "d": d}
+        return {"k": current_k, "d": d}
 
     def analyze_fundamental_data(
         self,
@@ -578,7 +609,12 @@ class ForexGoldStrategyBlock(Block):
         try:
             # Validate input
             if not input_data.price_data or len(input_data.price_data) < 3:
-                yield "error", "Insufficient price data. Please provide at least 3 data points."
+                error_msg = (
+                    "Insufficient price data. Please provide at least 3 data points. "
+                    "For accurate indicator calculations: RSI needs 14+, MACD needs 35+, "
+                    "Moving Averages need 50+ data points."
+                )
+                yield "error", error_msg
                 yield "signal", SignalType.HOLD.value
                 yield "confidence", 0.0
                 yield "technical_analysis", {}

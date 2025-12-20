@@ -277,7 +277,7 @@ async def test_risk_management_levels(forex_strategy_block, sample_price_data):
         assert outputs["stop_loss"] is not None
         assert outputs["take_profit"] is not None
 
-        # Verify risk-reward ratio is approximately correct
+        # Verify risk-reward ratio is approximately correct (allowing some tolerance)
         entry = outputs["entry_price"]
         sl = outputs["stop_loss"]
         tp = outputs["take_profit"]
@@ -285,8 +285,10 @@ async def test_risk_management_levels(forex_strategy_block, sample_price_data):
         if outputs["signal"] == SignalType.BUY.value:
             risk = entry - sl
             reward = tp - entry
-            assert reward / risk >= 1.5  # Should be close to risk_reward_ratio
+            # Should be close to risk_reward_ratio (2.0), allow 10% tolerance
+            assert reward / risk >= 1.8, f"Risk-reward ratio too low: {reward/risk:.2f}"
         else:  # SELL
             risk = sl - entry
             reward = entry - tp
-            assert reward / risk >= 1.5
+            # Should be close to risk_reward_ratio (2.0), allow 10% tolerance
+            assert reward / risk >= 1.8, f"Risk-reward ratio too low: {reward/risk:.2f}"

@@ -121,9 +121,21 @@ conservative_gold_input = {
     "symbol": "XAUUSD",
     "timeframe": "1 Day",
     "price_data": [
-        {"open": 2000 + i*5, "high": 2010 + i*5, 
-         "low": 1990 + i*5, "close": 2005 + i*5, "volume": 10000}
-        for i in range(50)  # 50 days of data
+        # More realistic price data with varying spreads and random-like movements
+        # Note: In production, use real market data from a data provider
+        {"open": 2000.00, "high": 2012.50, "low": 1995.30, "close": 2008.20, "volume": 10000},
+        {"open": 2008.20, "high": 2015.80, "low": 2003.40, "close": 2011.50, "volume": 11500},
+        {"open": 2011.50, "high": 2018.90, "low": 2009.20, "close": 2014.30, "volume": 9800},
+        {"open": 2014.30, "high": 2022.10, "low": 2010.50, "close": 2019.40, "volume": 12200},
+        {"open": 2019.40, "high": 2025.60, "low": 2016.80, "close": 2021.90, "volume": 10800},
+    ] + [
+        # Add more realistic varying data
+        {"open": 2000 + (i*3.5) + ((-1)**(i%3)*2), 
+         "high": 2010 + (i*3.5) + ((-1)**(i%3)*3), 
+         "low": 1990 + (i*3.5) + ((-1)**(i%3)*1.5), 
+         "close": 2005 + (i*3.5) + ((-1)**(i%2)*2.5), 
+         "volume": 10000 + (i*100)}
+        for i in range(5, 50)
     ],
     "confidence_threshold": 0.75,  # Higher threshold for conservative approach
     "risk_reward_ratio": 3.0,      # Better risk-reward ratio
