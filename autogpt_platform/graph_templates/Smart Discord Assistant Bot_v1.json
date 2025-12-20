@@ -1,0 +1,304 @@
+{
+  "id": "smart-discord-assistant-v1",
+  "version": 1,
+  "is_active": false,
+  "is_template": true,
+  "name": "Smart Discord Assistant Bot",
+  "description": "An intelligent Discord bot that can chat with AI, search the web, and transcribe YouTube videos. Use commands: !chat <message>, !search <query>, !youtube <url>",
+  "nodes": [
+    {
+      "id": "discord-reader",
+      "block_id": "df06086a-d5ac-4abb-9996-2ad0acb2eff7",
+      "input_default": {},
+      "metadata": {
+        "position": {
+          "x": -800,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "chat-pattern-matcher",
+      "block_id": "3146e4fe-2cdd-4f29-bd12-0c9d5bb4deb0",
+      "input_default": {
+        "pattern": "^!chat\\s+(.+)"
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": -200
+        }
+      }
+    },
+    {
+      "id": "search-pattern-matcher",
+      "block_id": "3146e4fe-2cdd-4f29-bd12-0c9d5bb4deb0",
+      "input_default": {
+        "pattern": "^!search\\s+(.+)"
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "youtube-pattern-matcher",
+      "block_id": "3146e4fe-2cdd-4f29-bd12-0c9d5bb4deb0",
+      "input_default": {
+        "pattern": "^!youtube\\s+(https?://(?:www\\.)?(?:youtube\\.com/watch\\?v=|youtu\\.be/)\\S+)"
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": 200
+        }
+      }
+    },
+    {
+      "id": "help-pattern-matcher",
+      "block_id": "3146e4fe-2cdd-4f29-bd12-0c9d5bb4deb0",
+      "input_default": {
+        "pattern": "^!help"
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": 400
+        }
+      }
+    },
+    {
+      "id": "chat-llm",
+      "block_id": "1f292d4a-41a4-4977-9684-7c8d560b9f91",
+      "input_default": {
+        "model": "gpt-4o-mini",
+        "sys_prompt": "You are a helpful and friendly AI assistant in a Discord server. Keep your responses concise and engaging. Use Discord markdown when appropriate."
+      },
+      "metadata": {
+        "position": {
+          "x": 200,
+          "y": -200
+        }
+      }
+    },
+    {
+      "id": "search-web",
+      "block_id": "87840993-2053-44b7-8da4-187ad4ee518c",
+      "input_default": {},
+      "metadata": {
+        "position": {
+          "x": 200,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "search-llm-summary",
+      "block_id": "1f292d4a-41a4-4977-9684-7c8d560b9f91",
+      "input_default": {
+        "model": "gpt-4o-mini",
+        "sys_prompt": "Summarize the search results in 2-3 concise paragraphs. Focus on answering the user's question directly."
+      },
+      "metadata": {
+        "position": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "youtube-transcribe",
+      "block_id": "f3a8f7e1-4b1d-4e5f-9f2a-7c3d5a2e6b4c",
+      "input_default": {},
+      "metadata": {
+        "position": {
+          "x": 200,
+          "y": 200
+        }
+      }
+    },
+    {
+      "id": "youtube-llm-summary",
+      "block_id": "1f292d4a-41a4-4977-9684-7c8d560b9f91",
+      "input_default": {
+        "model": "gpt-4o-mini",
+        "sys_prompt": "Provide a concise summary of this video transcript in 3-4 bullet points highlighting the key topics and main takeaways."
+      },
+      "metadata": {
+        "position": {
+          "x": 600,
+          "y": 200
+        }
+      }
+    },
+    {
+      "id": "help-text-block",
+      "block_id": "1ff065e9-88e8-4358-9d82-8dc91f622ba9",
+      "input_default": {
+        "data": "**Smart Discord Assistant Bot Commands:**\n\n`!chat <message>` - Chat with AI\n`!search <query>` - Search the web\n`!youtube <url>` - Get video summary\n`!help` - Show this help message\n\nExamples:\n• !chat What is quantum computing?\n• !search latest AI news\n• !youtube https://youtube.com/watch?v=example"
+      },
+      "metadata": {
+        "position": {
+          "x": 200,
+          "y": 400
+        }
+      }
+    },
+    {
+      "id": "discord-sender",
+      "block_id": "d0822ab5-9f8a-44a3-8971-531dd0178b6b",
+      "input_default": {},
+      "metadata": {
+        "position": {
+          "x": 1000,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "bot-token-constant",
+      "block_id": "1ff065e9-88e8-4358-9d82-8dc91f622ba9",
+      "input_default": {
+        "data": "YOUR_DISCORD_BOT_TOKEN_HERE"
+      },
+      "metadata": {
+        "position": {
+          "x": -800,
+          "y": -300
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "link-reader-to-bot-token",
+      "source_id": "bot-token-constant",
+      "sink_id": "discord-reader",
+      "source_name": "output",
+      "sink_name": "discord_bot_token",
+      "is_static": false
+    },
+    {
+      "id": "link-reader-to-chat-pattern",
+      "source_id": "discord-reader",
+      "sink_id": "chat-pattern-matcher",
+      "source_name": "message_content",
+      "sink_name": "text",
+      "is_static": false
+    },
+    {
+      "id": "link-reader-to-search-pattern",
+      "source_id": "discord-reader",
+      "sink_id": "search-pattern-matcher",
+      "source_name": "message_content",
+      "sink_name": "text",
+      "is_static": false
+    },
+    {
+      "id": "link-reader-to-youtube-pattern",
+      "source_id": "discord-reader",
+      "sink_id": "youtube-pattern-matcher",
+      "source_name": "message_content",
+      "sink_name": "text",
+      "is_static": false
+    },
+    {
+      "id": "link-reader-to-help-pattern",
+      "source_id": "discord-reader",
+      "sink_id": "help-pattern-matcher",
+      "source_name": "message_content",
+      "sink_name": "text",
+      "is_static": false
+    },
+    {
+      "id": "link-chat-pattern-to-llm",
+      "source_id": "chat-pattern-matcher",
+      "sink_id": "chat-llm",
+      "source_name": "positive",
+      "sink_name": "prompt",
+      "is_static": false
+    },
+    {
+      "id": "link-search-pattern-to-web",
+      "source_id": "search-pattern-matcher",
+      "sink_id": "search-web",
+      "source_name": "positive",
+      "sink_name": "query",
+      "is_static": false
+    },
+    {
+      "id": "link-search-to-llm",
+      "source_id": "search-web",
+      "sink_id": "search-llm-summary",
+      "source_name": "results",
+      "sink_name": "prompt",
+      "is_static": false
+    },
+    {
+      "id": "link-youtube-pattern-to-transcribe",
+      "source_id": "youtube-pattern-matcher",
+      "sink_id": "youtube-transcribe",
+      "source_name": "positive",
+      "sink_name": "youtube_url",
+      "is_static": false
+    },
+    {
+      "id": "link-youtube-to-llm",
+      "source_id": "youtube-transcribe",
+      "sink_id": "youtube-llm-summary",
+      "source_name": "transcript",
+      "sink_name": "prompt",
+      "is_static": false
+    },
+    {
+      "id": "link-chat-llm-to-sender",
+      "source_id": "chat-llm",
+      "sink_id": "discord-sender",
+      "source_name": "response",
+      "sink_name": "message_content",
+      "is_static": false
+    },
+    {
+      "id": "link-search-llm-to-sender",
+      "source_id": "search-llm-summary",
+      "sink_id": "discord-sender",
+      "source_name": "response",
+      "sink_name": "message_content",
+      "is_static": false
+    },
+    {
+      "id": "link-youtube-llm-to-sender",
+      "source_id": "youtube-llm-summary",
+      "sink_id": "discord-sender",
+      "source_name": "response",
+      "sink_name": "message_content",
+      "is_static": false
+    },
+    {
+      "id": "link-help-to-sender",
+      "source_id": "help-text-block",
+      "sink_id": "discord-sender",
+      "source_name": "output",
+      "sink_name": "message_content",
+      "is_static": false
+    },
+    {
+      "id": "link-reader-channel-to-sender",
+      "source_id": "discord-reader",
+      "sink_id": "discord-sender",
+      "source_name": "channel_name",
+      "sink_name": "channel_name",
+      "is_static": false
+    },
+    {
+      "id": "link-bot-token-to-sender",
+      "source_id": "bot-token-constant",
+      "sink_id": "discord-sender",
+      "source_name": "output",
+      "sink_name": "discord_bot_token",
+      "is_static": false
+    }
+  ]
+}
