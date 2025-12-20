@@ -43,9 +43,11 @@ Get a concise summary of any YouTube video.
 
 **Example:**
 ```
-!youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ
-!youtube https://youtu.be/example
+!youtube https://www.youtube.com/watch?v=VIDEO_ID
+!youtube https://youtu.be/ANOTHER_VIDEO_ID
 ```
+
+Note: Replace VIDEO_ID with actual YouTube video IDs. The video must have captions/transcripts available.
 
 ### 4. Help Command (!help)
 Display available commands and usage examples.
@@ -86,7 +88,7 @@ Display available commands and usage examples.
 
 1. In the graph editor, find the "bot-token-constant" node
 2. Click on it to edit
-3. Replace `YOUR_DISCORD_BOT_TOKEN_HERE` with your actual Discord bot token
+3. Replace `__REPLACE_WITH_YOUR_DISCORD_BOT_TOKEN__` with your actual Discord bot token
 4. Save the changes
 
 #### Step 3: Configure API Keys (if needed)
@@ -225,9 +227,9 @@ Modify the LLM system prompts to control response length:
 
 3. **Test YouTube:**
    ```
-   !youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ
+   !youtube https://www.youtube.com/watch?v=EXAMPLE_VIDEO_ID
    ```
-   Expected: Summary of the video content
+   Expected: Summary of the video content (Note: Replace with actual video URL that has captions)
 
 4. **Test Help:**
    ```

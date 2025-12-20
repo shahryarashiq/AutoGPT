@@ -210,9 +210,10 @@ Accepted formats:
 Web search block settings
 
 **Solution:**
-1. Verify web search block (ID: 87840993-2053-44b7-8da4-187ad4ee518c)
-2. Check if search API credentials are needed
+1. Verify web search block is properly connected in the graph
+2. Check if search API credentials are needed in your platform version
 3. Configure search provider in platform settings
+4. Ensure the search block has required inputs
 
 #### B. Rate Limited
 **Check:**

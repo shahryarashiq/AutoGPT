@@ -48,7 +48,7 @@ A Discord bot that can:
 3. Find "Smart Discord Assistant Bot"
 4. Click "Import Template"
 5. In the graph editor, find the "bot-token-constant" block
-6. Replace `YOUR_DISCORD_BOT_TOKEN_HERE` with your Discord bot token
+6. Replace `__REPLACE_WITH_YOUR_DISCORD_BOT_TOKEN__` with your Discord bot token
 7. Go to Settings → Add your OpenAI API key
 8. Click "Save" then "Run"
 
@@ -61,7 +61,7 @@ A Discord bot that can:
 
 2. Edit the file and replace the bot token:
    ```bash
-   # Replace YOUR_DISCORD_BOT_TOKEN_HERE with your actual token
+   # Replace __REPLACE_WITH_YOUR_DISCORD_BOT_TOKEN__ with your actual token
    nano /tmp/my-bot.json
    ```
 
@@ -85,8 +85,10 @@ Try other commands:
 ```
 !chat What is AutoGPT?
 !search latest tech news
-!youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ
+!youtube https://www.youtube.com/watch?v=EXAMPLE_VIDEO
 ```
+
+Note: Replace EXAMPLE_VIDEO with an actual YouTube video ID that has captions.
 
 ## Troubleshooting
 

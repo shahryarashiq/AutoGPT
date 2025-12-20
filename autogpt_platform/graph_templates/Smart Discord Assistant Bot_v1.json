@@ -161,7 +161,7 @@
       "id": "bot-token-constant",
       "block_id": "1ff065e9-88e8-4358-9d82-8dc91f622ba9",
       "input_default": {
-        "data": "YOUR_DISCORD_BOT_TOKEN_HERE"
+        "data": "__REPLACE_WITH_YOUR_DISCORD_BOT_TOKEN__"
       },
       "metadata": {
         "position": {

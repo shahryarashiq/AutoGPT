@@ -146,11 +146,12 @@ The modular architecture supports:
 
 ## Performance Considerations
 
-### Token Usage
-- **Chat**: ~50-200 tokens per request
-- **Search**: ~300-500 tokens (search results + summary)
-- **YouTube**: ~500-2000 tokens (transcript + summary)
-- **Help**: 0 tokens (static text)
+### Token Usage (Approximate)
+These are estimated ranges and actual usage may vary significantly based on content length, complexity, and model:
+- **Chat**: ~50-200 tokens per request (varies by message length)
+- **Search**: ~300-500 tokens (search results + summary, varies by results)
+- **YouTube**: ~500-2000 tokens (transcript + summary, varies by video length)
+- **Help**: 0 tokens (static text, no API calls)
 
 ### Response Time
 - **Chat**: 1-3 seconds
