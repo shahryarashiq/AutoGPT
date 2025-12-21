@@ -2,6 +2,22 @@
 
 Welcome to the AutoGPT Platform - a powerful system for creating and running AI agents to solve business problems. This platform enables you to harness the power of artificial intelligence to automate tasks, analyze data, and generate insights for your organization.
 
+## 🆕 Featured: Job Hunt Automation
+
+**NEW!** Automate your job search with our comprehensive Job Hunt Automation system:
+
+- 🔍 **Search jobs** across multiple platforms (Indeed, LinkedIn, Gulf Talent via Adzuna API)
+- 📄 **Optimize resumes** with AI-powered keyword matching for ATS systems
+- ✉️ **Generate cover letters** automatically for each position
+- 📊 **Track applications** with status management and statistics
+- 🌍 **UAE focused** - Perfect for Dubai, Abu Dhabi job markets
+- 💰 **100% FREE** - No subscriptions needed!
+
+**Quick Start:** See [JOB_HUNT_QUICKSTART.md](JOB_HUNT_QUICKSTART.md) for 5-minute setup  
+**Full Guide:** See [JOB_HUNT_GUIDE.md](JOB_HUNT_GUIDE.md) for comprehensive documentation
+
+---
+
 ## Getting Started
 
 ### Prerequisites

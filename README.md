@@ -107,14 +107,23 @@ The AutoGPT Server is the powerhouse of our platform This is where your agents r
 
 ### 🐙 Example Agents
 
-Here are two examples of what you can do with AutoGPT:
+Here are examples of what you can do with AutoGPT:
 
-1. **Generate Viral Videos from Trending Topics**
+1. **🎯 Job Hunt Automation (NEW!)**
+   - Automatically searches for jobs across multiple platforms (Indeed, LinkedIn, Gulf Talent)
+   - Optimizes your resume with AI to match job descriptions
+   - Generates customized cover letters for each position
+   - Tracks all applications with status management
+   - **100% FREE** - No subscriptions needed
+   - Perfect for UAE job markets (Dubai, Abu Dhabi, etc.)
+   - [Quick Start Guide](autogpt_platform/JOB_HUNT_QUICKSTART.md)
+
+2. **Generate Viral Videos from Trending Topics**
    - This agent reads topics on Reddit.
    - It identifies trending topics.
    - It then automatically creates a short-form video based on the content. 
 
-2. **Identify Top Quotes from Videos for Social Media**
+3. **Identify Top Quotes from Videos for Social Media**
    - This agent subscribes to your YouTube channel.
    - When you post a new video, it transcribes it.
    - It uses AI to identify the most impactful quotes to generate a summary.
