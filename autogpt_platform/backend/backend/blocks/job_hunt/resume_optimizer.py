@@ -163,10 +163,12 @@ class ResumeOptimizerBlock(Block):
         match_score = self._calculate_match_score(resume_keywords, job_keywords)
         
         # Optimize resume if requested
+        # Limit to top keywords to avoid over-stuffing the resume
+        MAX_KEYWORDS_TO_ADD = 10
         if input_data.auto_add_keywords and missing_keywords:
             optimized_resume = self._add_keywords_to_resume(
                 input_data.resume_text, 
-                missing_keywords[:10]  # Add top 10 missing keywords
+                missing_keywords[:MAX_KEYWORDS_TO_ADD]
             )
         else:
             optimized_resume = input_data.resume_text

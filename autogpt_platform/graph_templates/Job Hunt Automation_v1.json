@@ -89,7 +89,7 @@
       "id": "link-1",
       "source_id": "node-resume-parser",
       "sink_id": "node-resume-optimizer",
-      "source_name": "name",
+      "source_name": "resume_text",
       "sink_name": "resume_text"
     },
     {

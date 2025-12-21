@@ -80,7 +80,9 @@ class JobApplicationTrackerBlock(Block):
 
     def __init__(self):
         # In-memory storage for demo purposes
-        # In production, this would use a database
+        # WARNING: All data will be lost when the process restarts!
+        # In production, this should use a database (PostgreSQL, Redis, etc.)
+        # or persistent file storage for data retention.
         self._applications = {}
         
         super().__init__(

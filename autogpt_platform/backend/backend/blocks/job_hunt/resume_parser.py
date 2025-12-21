@@ -51,6 +51,9 @@ class ResumeParserBlock(Block):
         keywords: list[str] = SchemaField(
             description="Extracted keywords from the resume", default=[]
         )
+        resume_text: str = SchemaField(
+            description="Original resume text passed through for use in other blocks", default=""
+        )
 
     def __init__(self):
         super().__init__(
@@ -150,3 +153,4 @@ class ResumeParserBlock(Block):
         yield "education", education
         yield "summary", summary
         yield "keywords", keywords
+        yield "resume_text", resume_text  # Pass through original text
