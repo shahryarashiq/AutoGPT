@@ -1,0 +1,138 @@
+{
+  "id": "f6g7h8i9-0123-45fg-6789-6789012345fg",
+  "version": 1,
+  "is_active": false,
+  "is_template": true,
+  "name": "Job Hunt Automation",
+  "description": "An automated job hunting agent that searches for jobs, optimizes your resume for each position, generates cover letters, and tracks applications. Perfect for UAE job markets (Dubai, Abu Dhabi) and platforms like Indeed, LinkedIn, and Gulf Talent.",
+  "nodes": [
+    {
+      "id": "node-resume-parser",
+      "block_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+      "input_default": {
+        "resume_text": "Paste your resume text here or connect from a file upload block"
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": 200
+        }
+      }
+    },
+    {
+      "id": "node-job-search",
+      "block_id": "b2c3d4e5-6789-01bc-def2-2345678901bc",
+      "input_default": {
+        "platform": "generic",
+        "job_titles": [
+          "Cashier",
+          "Accountant"
+        ],
+        "locations": [
+          "Dubai, UAE",
+          "Abu Dhabi, UAE"
+        ],
+        "keywords": [],
+        "experience_level": "Entry Level",
+        "max_results": 20
+      },
+      "metadata": {
+        "position": {
+          "x": -400,
+          "y": 500
+        }
+      }
+    },
+    {
+      "id": "node-resume-optimizer",
+      "block_id": "c3d4e5f6-7890-12cd-ef34-3456789012cd",
+      "input_default": {
+        "auto_add_keywords": true
+      },
+      "metadata": {
+        "position": {
+          "x": 200,
+          "y": 350
+        }
+      }
+    },
+    {
+      "id": "node-cover-letter",
+      "block_id": "d4e5f6g7-8901-23de-f456-4567890123de",
+      "input_default": {
+        "tone": "professional"
+      },
+      "metadata": {
+        "position": {
+          "x": 800,
+          "y": 350
+        }
+      }
+    },
+    {
+      "id": "node-application-tracker",
+      "block_id": "e5f6g7h8-9012-34ef-5678-5678901234ef",
+      "input_default": {
+        "action": "add",
+        "status": "pending"
+      },
+      "metadata": {
+        "position": {
+          "x": 1400,
+          "y": 350
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "link-1",
+      "source_id": "node-resume-parser",
+      "sink_id": "node-resume-optimizer",
+      "source_name": "name",
+      "sink_name": "resume_text"
+    },
+    {
+      "id": "link-2",
+      "source_id": "node-job-search",
+      "sink_id": "node-resume-optimizer",
+      "source_name": "jobs",
+      "sink_name": "job_description"
+    },
+    {
+      "id": "link-3",
+      "source_id": "node-resume-optimizer",
+      "sink_id": "node-cover-letter",
+      "source_name": "optimized_resume",
+      "sink_name": "resume_summary"
+    },
+    {
+      "id": "link-4",
+      "source_id": "node-resume-parser",
+      "sink_id": "node-cover-letter",
+      "source_name": "name",
+      "sink_name": "applicant_name"
+    },
+    {
+      "id": "link-5",
+      "source_id": "node-resume-parser",
+      "sink_id": "node-cover-letter",
+      "source_name": "email",
+      "sink_name": "applicant_email"
+    },
+    {
+      "id": "link-6",
+      "source_id": "node-resume-parser",
+      "sink_id": "node-cover-letter",
+      "source_name": "phone",
+      "sink_name": "applicant_phone"
+    },
+    {
+      "id": "link-7",
+      "source_id": "node-cover-letter",
+      "sink_id": "node-application-tracker",
+      "source_name": "cover_letter",
+      "sink_name": "notes"
+    }
+  ]
+}
