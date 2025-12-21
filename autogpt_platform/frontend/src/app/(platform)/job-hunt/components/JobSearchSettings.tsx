@@ -94,6 +94,14 @@ export default function JobSearchSettings() {
 
   return (
     <div className="space-y-6">
+      <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+        <p className="text-sm text-green-800 dark:text-green-200">
+          <strong>✨ No API Key Needed!</strong> You can use this dashboard right now without any API keys.
+          It will show demo jobs so you can test everything. When you're ready, connect Indeed or Adzuna 
+          in the Platforms tab for real jobs.
+        </p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Job Search Preferences</CardTitle>

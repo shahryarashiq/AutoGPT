@@ -95,9 +95,13 @@ export default function PlatformConnections() {
   return (
     <div className="space-y-6">
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+          <strong>API Keys are Optional!</strong> You can use the dashboard without any API keys - 
+          it will show demo jobs for testing.
+        </p>
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Getting Started:</strong> We recommend starting with Indeed if you already have an account (completely free!).
-          Just register for a Publisher ID - it takes 2 minutes.
+          <strong>For real jobs:</strong> Connect Indeed if you have an account (takes 2 minutes, free).
+          See <strong>HOW_TO_GET_INDEED_API.md</strong> for step-by-step guide with pictures.
         </p>
       </div>
 
