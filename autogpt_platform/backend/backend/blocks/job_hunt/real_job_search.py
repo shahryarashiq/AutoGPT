@@ -19,16 +19,22 @@ class RealJobSearchBlock(Block):
     """
 
     class Input(BlockSchema):
-        platform: Literal["adzuna"] = SchemaField(
-            description="Job platform to search on (currently only Adzuna is supported with free API)",
+        platform: Literal["adzuna", "indeed"] = SchemaField(
+            description="Job platform to search on",
             default="adzuna"
         )
+        # Adzuna credentials
         app_id: str = SchemaField(
-            description="API Application ID (get free from https://developer.adzuna.com/)",
+            description="API Application ID (for Adzuna: get free from https://developer.adzuna.com/)",
             default=""
         )
         app_key: str = SchemaField(
-            description="API Application Key (get free from https://developer.adzuna.com/)",
+            description="API Application Key (for Adzuna: get free from https://developer.adzuna.com/)",
+            default=""
+        )
+        # Indeed credentials
+        publisher_id: str = SchemaField(
+            description="Publisher ID (for Indeed: get free from https://www.indeed.com/publisher)",
             default=""
         )
         query: str = SchemaField(
@@ -73,7 +79,7 @@ class RealJobSearchBlock(Block):
     def __init__(self):
         super().__init__(
             id="g7h8i9j0-1234-56gh-7890-7890123456gh",
-            description="Searches for real jobs using Adzuna's free API. Supports multiple countries including UAE, US, UK, Canada, Australia, India, and Singapore.",
+            description="Searches for real jobs using Adzuna or Indeed free APIs. Supports multiple countries including UAE, US, UK, Canada, Australia, India, and Singapore.",
             categories={BlockCategory.SEARCH, BlockCategory.AI},
             input_schema=RealJobSearchBlock.Input,
             output_schema=RealJobSearchBlock.Output,
@@ -194,6 +200,94 @@ class RealJobSearchBlock(Block):
         except Exception as e:
             raise RuntimeError(f"Failed to parse API response: {str(e)}")
 
+    def _search_indeed(
+        self,
+        publisher_id: str,
+        query: str,
+        location: str,
+        country_code: str,
+        results_per_page: int,
+        page: int,
+        sort_by: str
+    ) -> tuple[list[dict], int, str]:
+        """
+        Search jobs using Indeed Publisher API.
+        Documentation: https://opensource.indeedeng.io/api-documentation/
+        """
+        
+        if not publisher_id:
+            raise ValueError(
+                "Indeed Publisher ID required. Get free credentials at https://www.indeed.com/publisher"
+            )
+        
+        # Build API URL
+        url = "https://api.indeed.com/ads/apisearch"
+        
+        # Map country codes to Indeed country domains
+        country_map = {
+            "ae": "ae",  # UAE
+            "us": "www",  # USA
+            "uk": "uk",  # UK
+            "ca": "ca",  # Canada
+            "au": "au",  # Australia
+            "in": "in",  # India
+            "sg": "sg",  # Singapore
+        }
+        
+        # Build parameters
+        params = {
+            "publisher": publisher_id,
+            "q": query,
+            "l": location if location else "",
+            "co": country_map.get(country_code, "ae"),
+            "format": "json",
+            "v": "2",
+            "limit": min(results_per_page, 25),  # Indeed max is 25
+            "start": (page - 1) * min(results_per_page, 25),
+        }
+        
+        if sort_by == "date":
+            params["sort"] = "date"
+        
+        # Make API request
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Parse results
+            jobs = []
+            for result in data.get("results", []):
+                job = {
+                    "id": result.get("jobkey", ""),
+                    "title": result.get("jobtitle", ""),
+                    "company": result.get("company", "N/A"),
+                    "location": result.get("formattedLocation", location or "N/A"),
+                    "description": result.get("snippet", "")[:500],  # First 500 chars
+                    "salary_min": None,
+                    "salary_max": None,
+                    "salary_currency": "AED" if country_code == "ae" else "USD",
+                    "contract_type": "Full-time",
+                    "url": result.get("url", ""),
+                    "posted_date": result.get("date", ""),
+                    "category": "",
+                    "platform": "indeed"
+                }
+                jobs.append(job)
+            
+            total_results = data.get("totalResults", len(jobs))
+            search_summary = f"Found {total_results} jobs for '{query}'"
+            if location:
+                search_summary += f" in {location}"
+            search_summary += f" ({country_code.upper()})"
+            
+            return jobs, total_results, search_summary
+            
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Indeed API request failed: {str(e)}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse Indeed API response: {str(e)}")
+
     def run(self, input_data: Input, **kwargs) -> BlockOutput:
         """
         Search for jobs using the specified platform.
@@ -204,6 +298,20 @@ class RealJobSearchBlock(Block):
                 jobs, total_results, search_summary = self._search_adzuna(
                     app_id=input_data.app_id,
                     app_key=input_data.app_key,
+                    query=input_data.query,
+                    location=input_data.location,
+                    country_code=input_data.country_code,
+                    results_per_page=input_data.results_per_page,
+                    page=input_data.page,
+                    sort_by=input_data.sort_by
+                )
+                
+                yield "jobs", jobs
+                yield "total_results", total_results
+                yield "search_summary", search_summary
+            elif input_data.platform == "indeed":
+                jobs, total_results, search_summary = self._search_indeed(
+                    publisher_id=input_data.publisher_id,
                     query=input_data.query,
                     location=input_data.location,
                     country_code=input_data.country_code,

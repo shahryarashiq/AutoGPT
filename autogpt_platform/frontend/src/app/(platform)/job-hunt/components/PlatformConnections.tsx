@@ -21,6 +21,15 @@ interface Platform {
 export default function PlatformConnections() {
   const [platforms, setPlatforms] = useState<Platform[]>([
     {
+      id: "indeed",
+      name: "Indeed",
+      description: "Publisher API with free tier. Works great for UAE! Perfect if you already have an Indeed account.",
+      connected: false,
+      free: true,
+      requiresApiKey: true,
+      websiteUrl: "https://www.indeed.com/publisher",
+    },
+    {
       id: "adzuna",
       name: "Adzuna",
       description: "Free job search API with UAE support. No credit card required!",
@@ -28,15 +37,6 @@ export default function PlatformConnections() {
       free: true,
       requiresApiKey: true,
       websiteUrl: "https://developer.adzuna.com/",
-    },
-    {
-      id: "indeed",
-      name: "Indeed",
-      description: "Publisher API with free tier. Limited features but good coverage.",
-      connected: false,
-      free: true,
-      requiresApiKey: true,
-      websiteUrl: "https://www.indeed.com/publisher",
     },
     {
       id: "linkedin",
@@ -96,8 +96,8 @@ export default function PlatformConnections() {
     <div className="space-y-6">
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Getting Started:</strong> We recommend starting with Adzuna (completely free!).
-          Just sign up at their developer portal to get your API credentials.
+          <strong>Getting Started:</strong> We recommend starting with Indeed if you already have an account (completely free!).
+          Just register for a Publisher ID - it takes 2 minutes.
         </p>
       </div>
 
@@ -212,9 +212,11 @@ export default function PlatformConnections() {
                   <Button
                     onClick={() => handleConnect(platform.id)}
                     disabled={
-                      platform.id === "adzuna" &&
-                      (!credentials[platform.id]?.appId ||
-                        !credentials[platform.id]?.appKey)
+                      (platform.id === "adzuna" &&
+                        (!credentials[platform.id]?.appId ||
+                          !credentials[platform.id]?.appKey)) ||
+                      (platform.id === "indeed" &&
+                        !credentials[platform.id]?.publisherId)
                     }
                   >
                     <LinkIcon className="w-4 h-4 mr-2" />
@@ -258,8 +260,7 @@ export default function PlatformConnections() {
             for detailed instructions on getting API keys and connecting each platform.
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong>Quick Tip:</strong> Adzuna is the easiest to get started with - just sign up
-            and get instant access. No waiting, no approval needed!
+            <strong>Quick Tip:</strong> Indeed is the easiest if you already have an account - just register for a Publisher ID at indeed.com/publisher. It's free and takes 2 minutes!
           </p>
         </CardContent>
       </Card>
