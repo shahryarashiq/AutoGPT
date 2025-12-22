@@ -18,12 +18,12 @@ To use with real data, integrate with:
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Tuple
 
 # Simulated market data generator
 def generate_sample_prices(
     base_price: float, num_points: int = 200, trend: str = "up"
-) -> tuple[List[float], List[float], List[float]]:
+) -> Tuple[List[float], List[float], List[float]]:
     """
     Generate sample price data for testing
     

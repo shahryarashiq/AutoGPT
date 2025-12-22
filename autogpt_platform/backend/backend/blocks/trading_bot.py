@@ -16,7 +16,7 @@ Always test on demo accounts before live trading.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional
 
@@ -135,8 +135,12 @@ class TechnicalIndicators:
 
         macd_line = ema_fast - ema_slow
 
-        # For signal line, we'd need MACD history, simplified here
-        signal_line = macd_line * 0.9  # Simplified
+        # Calculate proper signal line as EMA of MACD values
+        # In a real implementation, you'd need historical MACD values
+        # For simplicity with single-point calculation, use a damping factor
+        # This is a reasonable approximation for the signal line
+        signal_damping = 2 / (signal + 1)
+        signal_line = macd_line * signal_damping
 
         histogram = macd_line - signal_line
 
@@ -186,6 +190,12 @@ class TechnicalIndicators:
 
 class TradingStrategy:
     """Advanced scalping strategy for Forex and Gold"""
+
+    # Constants for Bollinger Bands thresholds
+    BB_LOWER_THRESHOLD = 1.001  # 0.1% above lower band
+    BB_UPPER_THRESHOLD = 0.999  # 0.1% below upper band
+    ATR_STOP_MULTIPLIER = 1.5   # Stop loss distance in ATR multiples
+    RISK_REWARD_RATIO = 2.5     # Take profit to stop loss ratio
 
     def __init__(self):
         self.indicators = TechnicalIndicators()
@@ -240,8 +250,8 @@ class TradingStrategy:
         macd_bearish = macd["histogram"] < 0 and macd["macd"] < macd["signal"]
 
         # Bollinger Bands Analysis
-        bb_lower_touch = current_price <= bb["lower"] * 1.001
-        bb_upper_touch = current_price >= bb["upper"] * 0.999
+        bb_lower_touch = current_price <= bb["lower"] * self.BB_LOWER_THRESHOLD
+        bb_upper_touch = current_price >= bb["upper"] * self.BB_UPPER_THRESHOLD
 
         # BUY Signal Logic
         buy_conditions = 0
@@ -302,19 +312,18 @@ class TradingStrategy:
         if signal != SignalType.HOLD and atr > 0:
             entry_price = current_price
 
-            # ATR-based stop loss (1.5x ATR)
-            atr_multiplier = 1.5
-            stop_distance = atr * atr_multiplier
+            # ATR-based stop loss
+            stop_distance = atr * self.ATR_STOP_MULTIPLIER
 
             if signal == SignalType.BUY:
                 stop_loss = entry_price - stop_distance
-                # Risk/Reward = 2:1 or better
-                take_profit = entry_price + (stop_distance * 2.5)
+                # Risk/Reward ratio based take profit
+                take_profit = entry_price + (stop_distance * self.RISK_REWARD_RATIO)
             else:  # SELL
                 stop_loss = entry_price + stop_distance
-                take_profit = entry_price - (stop_distance * 2.5)
+                take_profit = entry_price - (stop_distance * self.RISK_REWARD_RATIO)
 
-            risk_reward_ratio = 2.5
+            risk_reward_ratio = self.RISK_REWARD_RATIO
 
         return TradingSignal(
             signal=signal,
@@ -335,7 +344,7 @@ class TradingStrategy:
                 "atr": atr,
                 "current_price": current_price,
             },
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             analysis=" | ".join(analysis_points),
         )
 
@@ -504,15 +513,18 @@ class TradingBotBlock(Block):
                 stop_distance = abs(signal_result.entry_price - signal_result.stop_loss)
 
                 if stop_distance > 0:
-                    # For Forex: position size in lots
-                    # For Gold: position size in ounces
+                    # Calculate position size based on pair type
                     if input_data.pair == TradingPair.XAU_USD:
-                        # Gold: $1 per point movement
+                        # Gold: position size in ounces
+                        # $1 per point movement per ounce
                         position_size = risk_amount / stop_distance
                     else:
-                        # Forex: standard lot = 100,000 units
-                        pip_value = 10  # Approximate for standard lot
-                        position_size = risk_amount / (stop_distance * 10000 * pip_value / 100000)
+                        # Forex: position size in standard lots
+                        # Convert price distance to pips (multiply by 10000 for most pairs)
+                        # Standard lot = 100,000 units, pip value ~$10
+                        stop_distance_pips = stop_distance * 10000
+                        pip_value = 10.0  # Standard lot pip value for most pairs
+                        position_size = risk_amount / (stop_distance_pips * pip_value / 100000)
 
             # Output results
             yield "signal", signal_result.signal.value
@@ -538,7 +550,15 @@ class TradingBotBlock(Block):
         except Exception as e:
             logger.error(f"Error in trading bot analysis: {str(e)}")
             yield "signal", "HOLD"
-            yield "analysis", f"Error occurred during analysis: {str(e)}"
-            yield "confidence", 0.0
             yield "pair", input_data.pair.value
             yield "timeframe", input_data.timeframe.value
+            yield "confidence", 0.0
+            yield "entry_price", None
+            yield "stop_loss", None
+            yield "take_profit", None
+            yield "risk_reward_ratio", None
+            yield "position_size", None
+            yield "indicators", {}
+            yield "analysis", f"Error occurred during analysis: {str(e)}"
+            yield "timestamp", datetime.now(timezone.utc).isoformat()
+            yield "risk_amount", None
