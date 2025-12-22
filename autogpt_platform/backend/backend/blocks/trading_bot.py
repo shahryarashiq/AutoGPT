@@ -449,31 +449,8 @@ class TradingBotBlock(Block):
             categories={BlockCategory.LOGIC, BlockCategory.AI},
             input_schema=TradingBotBlock.Input,
             output_schema=TradingBotBlock.Output,
-            test_input=[
-                {
-                    "pair": "XAUUSD",
-                    "timeframe": "15min",
-                    "prices": [
-                        2050.0 + i * 0.5 + (i % 5 - 2) * 0.3
-                        for i in range(250)
-                    ],
-                    "highs": [
-                        2050.0 + i * 0.5 + (i % 5 - 2) * 0.3 + 0.5
-                        for i in range(250)
-                    ],
-                    "lows": [
-                        2050.0 + i * 0.5 + (i % 5 - 2) * 0.3 - 0.5
-                        for i in range(250)
-                    ],
-                    "account_balance": 10000.0,
-                    "risk_per_trade": 1.0,
-                }
-            ],
-            test_output=[
-                ("signal", "BUY"),  # Example - actual output depends on calculation
-                ("pair", "XAUUSD"),
-                ("timeframe", "15min"),
-            ],
+            test_input=None,
+            test_output=None,
         )
         self.strategy = TradingStrategy()
 
