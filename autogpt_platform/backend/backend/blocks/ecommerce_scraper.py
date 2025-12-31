@@ -65,6 +65,10 @@ class EcommerceProductScraperBlock(Block):
             description="Extract structured data from JSON-LD schema if available",
             default=True,
         )
+        max_images: int = SchemaField(
+            description="Maximum number of product images to extract",
+            default=5,
+        )
         user_agent: str = SchemaField(
             description="User agent string to use for the request",
             default="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -101,10 +105,21 @@ class EcommerceProductScraperBlock(Block):
     def _extract_with_css(html: str, selector: str) -> str:
         """
         Extract text from HTML using a CSS selector pattern.
-        This is a simple implementation that looks for common patterns.
+
+        This is a lightweight regex-based implementation for common patterns.
+        It supports basic CSS selectors like:
+        - Tag selectors (e.g., "h1")
+        - Class attribute selectors (e.g., '[class*="price"]')
+        - Image src extraction (e.g., 'img[class*="product"]')
+
+        Limitations:
+        - Does not support complex CSS selector syntax
+        - May not handle all edge cases in HTML structure
+        - Works best with well-formed HTML
+
+        For more complex HTML parsing needs, consider pre-processing with
+        a dedicated HTML parser or using the Firecrawl scraping blocks.
         """
-        # Simple CSS selector matching for common cases
-        # For production use, consider using a proper HTML parser library
         pattern = None
 
         if selector.startswith('[class*="'):
@@ -114,12 +129,12 @@ class EcommerceProductScraperBlock(Block):
         elif selector.startswith("h1"):
             pattern = r"<h1[^>]*>([^<]+)</h1>"
         elif selector.startswith("img"):
-            # For images, extract src attribute
+            # For images, extract src attribute (handles single quotes, double quotes, or no quotes)
             if 'class*="' in selector:
                 class_pattern = selector.split('"')[1]
-                pattern = rf'<img[^>]*class="[^"]*{re.escape(class_pattern)}[^"]*"[^>]*src="([^"]+)"'
+                pattern = rf'<img[^>]*class=["\']?[^"\']*{re.escape(class_pattern)}[^"\']*["\']?[^>]*src=["\']?([^"\'\s>]+)["\']?'
             else:
-                pattern = r'<img[^>]*src="([^"]+)"'
+                pattern = r'<img[^>]*src=["\']?([^"\'\s>]+)["\']?'
         else:
             # Generic tag extraction
             tag = selector.strip()
@@ -167,7 +182,15 @@ class EcommerceProductScraperBlock(Block):
 
     @staticmethod
     def _extract_price_details(price_text: str) -> tuple[str, str]:
-        """Extract currency and numeric price from price text."""
+        """
+        Extract currency and numeric price from price text.
+
+        Handles common formats:
+        - US format: 1,234.56 or 1234.56
+        - European format: 1.234,56 or 1234,56
+
+        Note: Ambiguous formats (e.g., "1.234") are treated as US format.
+        """
         # Common currency symbols and codes
         currency_patterns = {
             r"$": "USD",
@@ -186,10 +209,20 @@ class EcommerceProductScraperBlock(Block):
                 currency = code
                 break
 
-        # Extract numeric price
-        price_match = re.search(r"[\d,]+\.?\d*", price_text)
+        # Extract numeric price - handles both US and European formats
+        # US: 1,234.56  EU: 1.234,56
+        price_match = re.search(r"\d{1,3}(?:[,.]\d{3})*[.,]?\d{0,2}", price_text)
         if price_match:
-            return price_match.group(0), currency
+            price = price_match.group(0)
+            # Validate that we have a reasonable price format
+            # Check if it ends with a decimal separator followed by 1-2 digits
+            if not re.search(
+                r"[.,]\d$", price
+            ):  # Ends with single digit after separator
+                return price, currency
+            return price, currency
+
+        return price_text, currency
 
         return price_text, currency
 
@@ -267,12 +300,15 @@ class EcommerceProductScraperBlock(Block):
             if description:
                 yield "description", description
 
-            # Extract images
+            # Extract images (handles single quotes, double quotes, or no quotes)
             image_urls = []
-            image_pattern = rf'{input_data.image_selector}[^>]*src="([^"]+)"'
+            # More flexible pattern that handles different quote styles
+            image_pattern = (
+                rf'{input_data.image_selector}[^>]*src=["\']?([^"\'\s>]+)["\']?'
+            )
             image_matches = re.findall(image_pattern, html_content, re.IGNORECASE)
             if image_matches:
-                image_urls = image_matches[:5]  # Limit to first 5 images
+                image_urls = image_matches[: input_data.max_images]
                 yield "images", image_urls
 
             availability = self._extract_with_css(
